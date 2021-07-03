@@ -7,13 +7,18 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+
+@EnableWebSecurity
 @Configuration
-@Order(1)
+@Order(-20)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	/*
 	 @Value("${user.oauth.user.username}")
@@ -28,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 @Override
 	 protected void configure(HttpSecurity http) throws Exception {
 		 
-		 http.authorizeRequests().antMatchers("/auth/login**","/login", "/oauth/authorize").permitAll();
+		// http.authorizeRequests().antMatchers("/auth/login**","/login", "/oauth/authorize").permitAll();
 		 
 		 
 		 //http.authorizeRequests().antMatchers("/userInfo").access("hasRole('" + AppRole.ROLE_USER + "')");
@@ -54,14 +59,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 
 	        // Logout Config
 	       // http.authorizeRequests().and().logout().logoutUrl("/logout").logoutSuccessUrl("/");
-		 
+		 /*
         http.requestMatchers().antMatchers("/auth/login**","/login", "/oauth/authorize")
             .and()
             .authorizeRequests()
             .anyRequest().authenticated()
             .and()
-            .formLogin();//.loginPage("/login").loginProcessingUrl("/j_spring_security_check");
-            
+            .formLogin();
+          */
+		 
+		 
+		 http.csrf().disable().formLogin().loginPage("/login").permitAll().and().requestMatchers()
+	        .antMatchers("/auth/login**","/login", "/oauth/authorize","/auth/oauth/authorize").and().authorizeRequests()
+	        .anyRequest().authenticated()
+		  .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler())
+		  .and()
+		  .logout()
+	        .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login?logout");
+	       
 	 }
 	 
 	 
@@ -74,7 +89,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	 @Override
 	 public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+		//auth.parentAuthenticationManager(authenticationManagerBean()).userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+		 auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 	 }
 	 
  /*
