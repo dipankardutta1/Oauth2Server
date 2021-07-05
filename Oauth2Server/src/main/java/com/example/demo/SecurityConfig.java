@@ -7,6 +7,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,6 +29,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 */
 	 @Autowired
 	 private UserDetailsService userDetailsService;
+	 
+	 
+	 @Override
+	  public void configure(WebSecurity web) throws Exception {
+	    web.ignoring().antMatchers("/css/**", "/images/**", "/js/**");
+	  }
  
 	 
 	 @Override
@@ -70,12 +77,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		 
 		 
 		 http.csrf().disable().formLogin().loginPage("/login").permitAll().and().requestMatchers()
-	        .antMatchers("/auth/login**","/login", "/oauth/authorize","/auth/oauth/authorize").and().authorizeRequests()
+	        .antMatchers("/auth/login**","/login", "/oauth/authorize","/auth/oauth/authorize","/revoke-token").and().authorizeRequests()
 	        .anyRequest().authenticated()
-		  .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler())
-		  .and()
-		  .logout()
-	        .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login?logout");
+		  .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());
+		  //.and()
+		  //.logout()
+	       // .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login?logout");
 	       
 	 }
 	 
