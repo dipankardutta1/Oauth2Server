@@ -11,10 +11,10 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 
 @EnableWebSecurity
@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 
 	 @Override
 	  public void configure(WebSecurity web) throws Exception {
-	    web.ignoring().antMatchers("/css/**", "/images/**", "/js/**");
+	    web.ignoring().antMatchers("/css/**", "/images/**", "/js/**","/validateEmail","/resetPassword");
 	  }
  
 	 
@@ -115,4 +115,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public PasswordEncoder passwordEncoder() { // changed
 		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 	}
+    
+   
 }
