@@ -113,6 +113,7 @@ public class UserService {
 		
 		
 		password = "{bcrypt}"+bCryptPasswordEncoder.encode(password);
+		
 		user.setPassword(password);
 		
 		userRepository.save(user);
@@ -133,9 +134,11 @@ public class UserService {
 		user.setEmail(username);
 		user.setEnabled(true);
 		user.setId(UUID.randomUUID().toString());
-		user.setPassword(password);
+		user.setPassword("{bcrypt}"+bCryptPasswordEncoder.encode(password));
 		user.setRoles(roles);
 		user.setUsername(username);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
 		
 		
 		userRepository.save(user);
