@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.demo.OtpService;
 import com.example.demo.ResetPasswordDto;
 import com.example.demo.UserService;
+import com.example.demo.ValidateEmailForRegDto;
 
 @Controller
 public class LoginController {
@@ -193,8 +195,144 @@ public class LoginController {
 		
     }
 	
+	@GetMapping("register")
+	public String goToRegisterPage() {
+		return "registerUser";
+	}
 	
 	
+	@PostMapping("/register")
+    public String register(Model model,
+    		@RequestParam("firstName")String firstName,
+    		@RequestParam("lastName")String lastName,
+    		@RequestParam("username")String username
+    		){
+		
+		if(firstName == null || firstName.isEmpty()) {
+			model.addAttribute("msg","First Name is empty !");
+			return "registerUser";
+		}
+		
+		if(lastName == null || lastName.isEmpty()) {
+			model.addAttribute("msg","Last Name is empty !");
+			return "registerUser";
+		}
+		
+		if(username == null || username.isEmpty()) {
+			model.addAttribute("msg","Email is empty !");
+			return "registerUser";
+		}
+		
+		
+		
+		String regex = "^(.+)@(.+)$";
+		Pattern pattern = Pattern.compile(regex);
+		
+		if(!pattern.matcher(username).matches()) {
+			model.addAttribute("msg","Email is not valid !");
+			return "registerUser";
+		}
+		
+		
+		if(userService.isEmailAreadyExist(username)) {
+			model.addAttribute("msg","Email is already taken !");
+			return "registerUser";
+		}
+		
+		
+		
+		ValidateEmailForRegDto validateEmailForRegDto = new ValidateEmailForRegDto();
+		validateEmailForRegDto.setFirstName(firstName);
+		validateEmailForRegDto.setLastName(lastName);
+		validateEmailForRegDto.setUsername(username);
+		
+		userService.sendEmail(username);
+		
+		model.addAttribute("validateEmailForRegDto", validateEmailForRegDto);
+		
+		return "validateEmailForReg";
+		
+		
+		
+	}
+		
+	
+	@PostMapping("/validateEmailForReg")
+    public String validateEmailForReg(Model model,@Valid ValidateEmailForRegDto validateEmailForRegDto,BindingResult errors){
+		
+		
+		if (errors.hasErrors()) {
+			
+			String error = "";
+			
+			for (Object object : errors.getAllErrors()) {
+			    if(object instanceof FieldError) {
+			        FieldError fieldError = (FieldError) object;
+			        error =  fieldError.getField() + " "+ fieldError.getDefaultMessage();
+			       
+			    }
+
+			   /* if(object instanceof ObjectError) {
+			        ObjectError objectError = (ObjectError) object;
+			        error = error + objectError.getCode()+" ";
+			        
+			    }*/
+			}
+			
+			
+			model.addAttribute("msg",error);
+			return "validateEmailForReg";
+		  }
+		
+		
+		try {
+			Integer otpGiven = Integer.valueOf(validateEmailForRegDto.getOtp());
+			
+			
+			
+			
+
+			if(otpGiven >= 0){
+				Integer serverOtp = otpService.getOtp(validateEmailForRegDto.getUsername());
+
+				if(serverOtp > 0){
+					if(otpGiven.equals(serverOtp)){
+						
+						
+						userService.saveUser(validateEmailForRegDto.getFirstName(),validateEmailForRegDto.getLastName(),validateEmailForRegDto.getUsername(),validateEmailForRegDto.getPassword());
+						otpService.clearOTP(validateEmailForRegDto.getUsername());
+						return "regSuccess";
+						
+						
+						
+					}else{
+						model.addAttribute("msg","Entered Otp is not valid");
+						return "validateEmailForReg";
+					}
+				}else {
+					model.addAttribute("msg","Entered Otp is not valid");
+					return "validateEmailForReg";
+				}
+			}else {
+				model.addAttribute("msg","Entered Otp is not valid");
+				return "validateEmailForReg";
+			}
+				
+		}catch(NumberFormatException e) {
+			model.addAttribute("msg","Entered Otp is not valid");
+			return "validateEmailForReg";
+		}catch(Exception e) {
+			model.addAttribute("msg","Error occurred");
+			return "validateEmailForReg";
+		}
+		
+		
+		
+		
+		
+		
+		
+    }
 	
 	/*
 	@RequestMapping(value="/logout", method = RequestMethod.GET)

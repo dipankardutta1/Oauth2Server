@@ -8,7 +8,14 @@ public class Role {
 
 	private String name;
 	
+	public Role(){
+		
+	}
 	
+	public Role(Long id, String name){
+		this.name = name;
+		this.id = id;
+	}
 
 	
 

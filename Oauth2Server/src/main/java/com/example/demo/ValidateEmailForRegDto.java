@@ -3,8 +3,11 @@ package com.example.demo;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class ResetPasswordDto {
-	
+public class ValidateEmailForRegDto {
+	@NotBlank
+	private String firstName;
+	@NotBlank
+	private String lastName;
 	@NotBlank
 	private String username;
 	@NotBlank
@@ -12,9 +15,18 @@ public class ResetPasswordDto {
 	@NotBlank 
 	@Size(min=6)
 	private String password;
-	@NotBlank 
-	@Size(min=6)
-	private String confirm;
+	public String getFirstName() {
+		return firstName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public String getLastName() {
+		return lastName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 	public String getUsername() {
 		return username;
 	}
@@ -33,13 +45,9 @@ public class ResetPasswordDto {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public String getConfirm() {
-		return confirm;
-	}
-	public void setConfirm(String confirm) {
-		this.confirm = confirm;
-	}
 	
 	
-
+	
+	
+	
 }

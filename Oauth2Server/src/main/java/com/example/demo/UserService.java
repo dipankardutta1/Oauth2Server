@@ -1,6 +1,8 @@
 package com.example.demo;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.entity.PasswordOtp;
+import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 
 @Service(value = "userService")
@@ -37,25 +40,37 @@ public class UserService {
 
 		return user;
 	}
+	
+	public Boolean isEmailAreadyExist(String username) {
+		User user = userRepository.findByUsername(username);
+		
+		if(user == null) {
+			return false;
+		}else {
+			return true;
+		}
+
+		
+	}
 
 
 	public String sendEmail(String username) {
-		User user = null;
+		//User user = null;
 
-		if (username.contains("@"))
+		/*if (username.contains("@"))
 			user = userRepository.findByEmail(username);
 		else
 			user = userRepository.findByUsername(username);
+		*/
 		
-		
-		if(user == null) {
+		if(username == null || username.isEmpty()) {
 			return null;
 		}else {
 			// send email
 			
-			int otp = otpService.generateOTP(user.getEmail());
+			int otp = otpService.generateOTP(username);
 			
-			emailSend(user.getEmail(),otp+"");
+			emailSend(username,otp+"");
 			
 			
 //			PasswordOtp passwordOtp = new PasswordOtp();
@@ -65,7 +80,7 @@ public class UserService {
 //			passwordOtp.setEmail(user.getEmail());
 //			
 //			passwordOtpRepository.save(passwordOtp);
-			return user.getEmail();
+			return username;
 		}
 		
 	}
@@ -87,14 +102,41 @@ public class UserService {
 	@Transactional
 	public void updatePassword(String password, String username) {
 		User user = null;
-
+		/*
 		if (username.contains("@"))
 			user = userRepository.findByEmail(username);
 		else
 			user = userRepository.findByUsername(username);
+		*/
+		
+		user = userRepository.findByUsername(username);
+		
 		
 		password = "{bcrypt}"+bCryptPasswordEncoder.encode(password);
 		user.setPassword(password);
+		
+		userRepository.save(user);
+		
+	}
+
+	@Transactional
+	public void saveUser(String firstName, String lastName, String username, String password) {
+		
+		List<Role> roles = new ArrayList<Role>();
+		roles.add(new Role(null, "role_user"));
+		
+		
+		User user = new User();
+		user.setAccountNonExpired(true);
+		user.setAccountNonLocked(true);
+		user.setCredentialsNonExpired(true);
+		user.setEmail(username);
+		user.setEnabled(true);
+		user.setId(UUID.randomUUID().toString());
+		user.setPassword(password);
+		user.setRoles(roles);
+		user.setUsername(username);
+		
 		
 		userRepository.save(user);
 		

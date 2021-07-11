@@ -28,16 +28,19 @@ public class CustomUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String input) {
 		User user = null;
-
+		/*
 		if (input.contains("@"))
 			user = userRepository.findByEmail(input);
 		else
 			user = userRepository.findByUsername(input);
 		
-		
+		*/
 
+		user = userRepository.findByUsername(input);
+		
+		
 		if (user == null)
-			throw new BadCredentialsException("Bad credentials lll");
+			throw new BadCredentialsException("Bad credentials");
 
 		new AccountStatusUserDetailsChecker().check(user);
 
