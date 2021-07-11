@@ -127,9 +127,9 @@ public class UserService {
 		
 		
 		User user = new User();
-		user.setAccountNonExpired(true);
-		user.setAccountNonLocked(true);
-		user.setCredentialsNonExpired(true);
+		user.setAccountNonExpired(false);
+		user.setAccountNonLocked(false);
+		user.setCredentialsNonExpired(false);
 		user.setEmail(username);
 		user.setEnabled(true);
 		user.setId(UUID.randomUUID().toString());
