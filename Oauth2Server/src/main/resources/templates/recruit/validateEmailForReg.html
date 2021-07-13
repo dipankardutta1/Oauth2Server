@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" >
+<link rel="stylesheet" th:href="@{/css/font-awesome.min.css}" >
+<link rel="stylesheet" th:href="@{/css/custom.css}" >
+
+<script th:src="@{/js/bootstrap.bundle.min.js}" ></script>
+<script th:src="@{/js/jquery.min.js}" ></script>
+</head>
+<body>
+
+
+<div class="error" th:if="${param.error}">
+	<div class="alert alert-danger" role="alert">
+	  <span th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}">Wrong input!</span>
+	</div>
+</div>
+
+<div class="error" th:if="${!#strings.isEmpty(msg)}">
+	<div class="alert alert-danger" role="alert">
+	  <span th:text="${msg}">Wrong input!</span>
+	</div>
+</div>
+
+
+
+<div class="container-fluid px-1 px-md-5 px-lg-1 px-xl-5 py-5 mx-auto">
+    <div class="card card0 border-0">
+        <div class="row d-flex">
+            <div class="col-lg-6">
+                <div class="card1 pb-5">
+                    <div class="row"> <img th:src="@{/images/gen.png}" class="logo"> </div>
+                    <div class="row px-3 justify-content-center mt-4 mb-5 border-line"> <img th:src="@{/images/recruit.png}" class="image"> </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+            	 <form class="modal-content animate" method="post" th:object="${validateEmailForRegDto}" th:action="@{/recruit/validateEmailForReg}">
+                <div class="card2 card border-0 px-4 py-5">
+                   
+                    
+                    <div class="row px-3"> <label class="mb-1">
+                            <h6 class="mb-0 text-sm">Enter OTP</h6>
+                        </label> 
+                        <input type="hidden" id="firstName" th:field="*{firstName}" required="required" /> 
+                        <input type="hidden" id="lastName" th:field="*{lastName}" required="required" /> 
+                        <input type="hidden" id="username" th:field="*{username}" required="required" /> 
+                        <input class="mb-4" type="password" th:field="*{otp}" placeholder="Enter OTP sent to your Email" required="required" /> 
+                    </div>
+                    <div class="row px-3"> <label class="mb-1">
+                            <h6 class="mb-0 text-sm">Password (6 or more characters)</h6>
+                        </label> <input class="mb-4" type="password" th:field="*{password}" placeholder="Enter Password" /> 
+                    </div>
+                    
+                    <div class="row mb-3 px-3"> <button type="submit" class="btn btn-blue text-center">Agree & Join</button> </div>
+                    
+                </div>
+                 </form>
+            </div>
+           
+        </div>
+        <div class="bg-blue py-4">
+            <div class="row px-3"> <small class="ml-4 ml-sm-5 mb-2">Copyright &copy; 2019. All rights reserved.</small>
+               <!--  <div class="social-contact ml-4 ml-sm-auto"> <span class="fa fa-facebook mr-4 text-sm"></span> <span class="fa fa-google-plus mr-4 text-sm"></span> <span class="fa fa-linkedin mr-4 text-sm"></span> <span class="fa fa-twitter mr-4 mr-sm-5 text-sm"></span> </div> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+</body>
+</html>

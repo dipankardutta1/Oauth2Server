@@ -144,5 +144,35 @@ public class UserService {
 		userRepository.save(user);
 		
 	}
+	
+	
+	
+	@Transactional
+	public void saveRecruiter(String firstName, String lastName, String username, String password) {
+		
+		List<Role> roles = new ArrayList<Role>();
+		roles.add(new Role(null, "role_admin"));
+		
+		
+		User user = new User();
+		user.setAccountNonExpired(false);
+		user.setAccountNonLocked(false);
+		user.setCredentialsNonExpired(false);
+		user.setEmail(username);
+		user.setEnabled(true);
+		user.setId(UUID.randomUUID().toString());
+		user.setPassword("{bcrypt}"+bCryptPasswordEncoder.encode(password));
+		user.setRoles(roles);
+		user.setUsername(username);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		
+		
+		userRepository.save(user);
+		
+	}
+	
+	
+	
 
 }

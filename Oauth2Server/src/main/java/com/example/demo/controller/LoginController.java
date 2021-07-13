@@ -195,6 +195,157 @@ public class LoginController {
 		
     }
 	
+	
+	
+	@GetMapping("/recruit/register")
+	public String goToRecruitRegisterPage() {
+		return "recruit/register";
+	}
+	
+	
+	@PostMapping("/recruit/register")
+	public String registerRecruit(Model model,
+			@RequestParam("firstName")String firstName,
+    		@RequestParam("lastName")String lastName,
+    		@RequestParam("username")String username
+			) {
+		
+		
+		if(firstName == null || firstName.isEmpty()) {
+			model.addAttribute("msg","First Name is empty !");
+			return "recruit/register";
+		}
+		
+		if(lastName == null || lastName.isEmpty()) {
+			model.addAttribute("msg","Last Name is empty !");
+			return "recruit/register";
+		}
+		
+		if(username == null || username.isEmpty()) {
+			model.addAttribute("msg","Email is empty !");
+			return "recruit/register";
+		}
+		
+		
+		String regex = "^(.+)@(.+)$";
+		Pattern pattern = Pattern.compile(regex);
+		
+		if(!pattern.matcher(username).matches()) {
+			model.addAttribute("msg","Email is not valid !");
+			return "recruit/register";
+		}
+		
+		
+		if(userService.isEmailAreadyExist(username)) {
+			model.addAttribute("msg","Email is already taken !");
+			return "recruit/register";
+		}
+		
+		
+		
+		ValidateEmailForRegDto validateEmailForRegDto = new ValidateEmailForRegDto();
+		validateEmailForRegDto.setFirstName(firstName);
+		validateEmailForRegDto.setLastName(lastName);
+		validateEmailForRegDto.setUsername(username);
+		
+		userService.sendEmail(username);
+		
+		model.addAttribute("validateEmailForRegDto", validateEmailForRegDto);
+		
+		return "recruit/validateEmailForReg";
+		
+		
+		
+	}
+	
+	
+	
+	
+	
+	@PostMapping("/recruit/validateEmailForReg")
+    public String validateEmailForRecruiterReg(Model model,@Valid ValidateEmailForRegDto validateEmailForRegDto,BindingResult errors){
+		
+		
+		if (errors.hasErrors()) {
+			
+			String error = "";
+			
+			for (Object object : errors.getAllErrors()) {
+			    if(object instanceof FieldError) {
+			        FieldError fieldError = (FieldError) object;
+			        error =  fieldError.getField() + " "+ fieldError.getDefaultMessage();
+			       
+			    }
+
+			   /* if(object instanceof ObjectError) {
+			        ObjectError objectError = (ObjectError) object;
+			        error = error + objectError.getCode()+" ";
+			        
+			    }*/
+			}
+			
+			
+			model.addAttribute("msg",error);
+			return "recruit/validateEmailForReg";
+		  }
+		
+		
+		try {
+			Integer otpGiven = Integer.valueOf(validateEmailForRegDto.getOtp());
+			
+			
+			
+			
+
+			if(otpGiven >= 0){
+				Integer serverOtp = otpService.getOtp(validateEmailForRegDto.getUsername());
+
+				if(serverOtp > 0){
+					if(otpGiven.equals(serverOtp)){
+						
+						
+						userService.saveRecruiter(validateEmailForRegDto.getFirstName(),validateEmailForRegDto.getLastName(),validateEmailForRegDto.getUsername(),validateEmailForRegDto.getPassword());
+						otpService.clearOTP(validateEmailForRegDto.getUsername());
+						return "recruit/regSuccess";
+						
+						
+						
+					}else{
+						model.addAttribute("msg","Entered Otp is not valid");
+						return "recruit/validateEmailForReg";
+					}
+				}else {
+					model.addAttribute("msg","Entered Otp is not valid");
+					return "recruit/validateEmailForReg";
+				}
+			}else {
+				model.addAttribute("msg","Entered Otp is not valid");
+				return "recruit/validateEmailForReg";
+			}
+				
+		}catch(NumberFormatException e) {
+			model.addAttribute("msg","Entered Otp is not valid");
+			return "recruit/validateEmailForReg";
+		}catch(Exception e) {
+			model.addAttribute("msg","Error occurred");
+			return "recruit/validateEmailForReg";
+		}
+		
+		
+		
+		
+		
+		
+		
+    }
+	
+	
+	
+	
+	
+	
+	
+	
 	@GetMapping("register")
 	public String goToRegisterPage() {
 		return "registerUser";
