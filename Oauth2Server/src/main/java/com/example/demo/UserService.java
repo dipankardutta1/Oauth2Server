@@ -1,18 +1,19 @@
 package com.example.demo;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.entity.PasswordOtp;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 
@@ -169,6 +170,37 @@ public class UserService {
 		
 		
 		userRepository.save(user);
+		
+	}
+
+	public ResponseDto getNameByEmail(String username) {
+		User user = userRepository.findByUsername(username);
+		
+		if(user == null) {
+			ResponseDto res = new ResponseDto();
+			
+			res.setMsg("candidate Id is not Correct!");
+			res.setOutput(username);
+			res.setHttpStatus(HttpStatus.FORBIDDEN);
+			return res;
+		}else {
+			Map<String,String> map = new HashMap<String,String>();
+			map.put("firstName", user.getFirstName());
+			map.put("lastName", user.getLastName());
+			map.put("email", user.getEmail());
+			
+			ResponseDto res = new ResponseDto();
+			
+			res.setMsg("candidate fetched successfully !");
+			res.setOutput(map);
+			res.setHttpStatus(HttpStatus.OK);
+			
+			
+			
+			
+			return res;
+		}
+		
 		
 	}
 	
